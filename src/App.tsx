@@ -46,7 +46,7 @@ const App = () => {
   }
 
   return (
-    <Card className="w-full max-w-lg mx-auto p-6 bg-gradient-to-br h-dvh from-blue-50 to-purple-50">
+    <Card className="w-full mx-auto p-6 bg-gradient-to-br h-dvh from-blue-50 to-purple-50">
       <CardContent>
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-purple-600 mb-2">
@@ -54,16 +54,19 @@ const App = () => {
           </h1>
           <div className="flex flex-col justify-center items-center gap-2">
             <span className="text-lg">Score: {score}</span>
-            <div className="flex flex-wrap items-center ml-4">
+            <div className="flex flex-wrap items-center">
               {[...Array(streak)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 text-yellow-400" />
+                <Star
+                  key={i}
+                  className="w-5 h-5 text-yellow-400 fill-yellow-400"
+                />
               ))}
             </div>
           </div>
         </div>
 
         <div className="text-center mb-8">
-          <div className="text-4xl font-bold text-gray-700 mb-4">
+          <div className="text-6xl font-bold text-gray-700 mb-8">
             {num1} × {num2} = ?
           </div>
           <input
@@ -71,7 +74,7 @@ const App = () => {
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             onKeyDown={handleKeyPress}
-            className="w-24 text-center text-2xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500"
+            className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
             placeholder="?"
             autoFocus
           />
@@ -80,7 +83,7 @@ const App = () => {
         <div className="flex justify-center gap-4 mb-6">
           <Button
             onClick={checkAnswer}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg"
+            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded-lg text-2xl h-auto"
           >
             Check Answer
           </Button>
