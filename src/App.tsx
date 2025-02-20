@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Star } from 'lucide-react'
 
@@ -10,6 +10,7 @@ const App = () => {
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
 
   const generateNewProblem = () => {
     // Generate numbers between 2 and 12 for times tables practice
@@ -20,6 +21,7 @@ const App = () => {
     setUserAnswer('')
     setFeedback('')
     setShowAnswer(false)
+    inputRef.current?.focus()
   }
 
   const checkAnswer = () => {
@@ -72,10 +74,12 @@ const App = () => {
           </div>
           <input
             type="tel"
+            ref={inputRef}
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             onKeyDown={handleKeyPress}
             onBlur={checkAnswer}
+            onFocus={() => window.scrollTo(0, 0)}
             className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
             placeholder="?"
             autoFocus
