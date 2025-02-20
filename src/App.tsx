@@ -55,17 +55,6 @@ const App = () => {
           <h1 className="text-3xl font-bold text-purple-600 mb-2">
             Multiplable
           </h1>
-          <div className="flex flex-col justify-center items-center gap-2">
-            <span className="text-lg">Score: {score}</span>
-            <div className="flex flex-wrap items-center">
-              {[...Array(streak)].map((_, i) => (
-                <Star
-                  key={i}
-                  className="w-5 h-5 text-yellow-400 fill-yellow-400"
-                />
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="text-center mb-8">
@@ -84,6 +73,17 @@ const App = () => {
             placeholder="?"
             autoFocus
           />
+        </div>
+        <div className="flex flex-col justify-center items-center gap-2 mb-5">
+          <span className="text-lg">Score: {score}</span>
+          <div className="flex flex-wrap items-center">
+            {[...Array(streak)].map((_, i) => (
+              <Star
+                key={i}
+                className="w-5 h-5 text-yellow-400 fill-yellow-400"
+              />
+            ))}
+          </div>
         </div>
 
         {feedback && (
