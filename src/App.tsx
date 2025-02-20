@@ -9,7 +9,6 @@ const App = () => {
   const [feedback, setFeedback] = useState('')
   const [score, setScore] = useState(0)
   const [streak, setStreak] = useState(0)
-  const [showAnswer, setShowAnswer] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const generateNewProblem = () => {
@@ -20,31 +19,23 @@ const App = () => {
     setNum2(newNum2)
     setUserAnswer('')
     setFeedback('')
-    setShowAnswer(false)
     inputRef.current?.focus()
   }
 
-  const checkAnswer = () => {
-    if (!userAnswer) return
+  const checkAnswer = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const answer = e.target.value
+    setUserAnswer(answer)
+
+    if (!answer) return
 
     const correctAnswer = num1 * num2
-    const userGuess = parseInt(userAnswer)
+    const userGuess = parseInt(answer)
 
     if (userGuess === correctAnswer) {
       setFeedback('Correct! Great job! 🎉')
       setScore(score + 1)
       setStreak(streak + 1)
-      setTimeout(generateNewProblem, 1000)
-    } else {
-      setFeedback('Not quite right. Try again! 💪')
-      setStreak(0)
-      setShowAnswer(true)
-    }
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      checkAnswer()
+      setTimeout(generateNewProblem, 500)
     }
   }
 
@@ -55,6 +46,10 @@ const App = () => {
           <h1 className="text-3xl font-bold text-purple-600 mb-2">
             Multiplable
           </h1>
+          <div className="flex justify-center items-center gap-2 mb-5">
+            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            {score}
+          </div>
         </div>
 
         <div className="text-center mb-8">
@@ -65,25 +60,12 @@ const App = () => {
             type="tel"
             ref={inputRef}
             value={userAnswer}
-            onChange={(e) => setUserAnswer(e.target.value)}
-            onKeyDown={handleKeyPress}
-            onBlur={checkAnswer}
+            onChange={checkAnswer}
             onFocus={() => window.scrollTo(0, 0)}
             className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
             placeholder="?"
             autoFocus
           />
-        </div>
-        <div className="flex flex-col justify-center items-center gap-2 mb-5">
-          <span className="text-lg">Score: {score}</span>
-          <div className="flex flex-wrap items-center">
-            {[...Array(streak)].map((_, i) => (
-              <Star
-                key={i}
-                className="w-5 h-5 text-yellow-400 fill-yellow-400"
-              />
-            ))}
-          </div>
         </div>
 
         {feedback && (
@@ -95,11 +77,6 @@ const App = () => {
             }`}
           >
             {feedback}
-            {showAnswer && (
-              <div className="text-gray-600 mt-2">
-                The correct answer is {num1 * num2}
-              </div>
-            )}
           </div>
         )}
       </CardContent>
