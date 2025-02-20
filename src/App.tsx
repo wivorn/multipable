@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
 import { Star } from 'lucide-react'
 
 const App = () => {
@@ -24,6 +23,8 @@ const App = () => {
   }
 
   const checkAnswer = () => {
+    if (!userAnswer) return
+
     const correctAnswer = num1 * num2
     const userGuess = parseInt(userAnswer)
 
@@ -74,19 +75,11 @@ const App = () => {
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
             onKeyDown={handleKeyPress}
+            onBlur={checkAnswer}
             className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
             placeholder="?"
             autoFocus
           />
-        </div>
-
-        <div className="flex justify-center gap-4 mb-6">
-          <Button
-            onClick={checkAnswer}
-            className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-4 rounded-lg text-2xl h-auto"
-          >
-            Check Answer
-          </Button>
         </div>
 
         {feedback && (
