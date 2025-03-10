@@ -21,21 +21,26 @@ function shuffle(array: number[]) {
   return array
 }
 
+const ROUND_TIME_SECOND = 30
+
 const App = () => {
   const [questions, setQuestions] = useState<number[]>(
     shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
   )
   const [num1, setNum1] = useState(2)
-  const [num2, setNum2] = useState<number>(questions[0])
+  const [num2, setNum2] = useState(-1)
   const [showSettings, setShowSettings] = useState(false)
   const [userAnswer, setUserAnswer] = useState('')
   const [feedback, setFeedback] = useState('')
   const [score, setScore] = useState(0)
-  const [streak, setStreak] = useState(0)
+  const [showStart, setShowStart] = useState(true)
+  const [remainingTime, setRemainingTime] = useState(ROUND_TIME_SECOND)
   const inputRef = useRef<HTMLInputElement>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const generateNewProblem = () => {
-    setNum2(questions[(score + 1) % questions.length])
+  const generateNewProblem = (score: number) => {
+    setNum2(questions[score % questions.length])
     setUserAnswer('')
     setFeedback('')
     inputRef.current?.focus()
@@ -56,8 +61,7 @@ const App = () => {
         setQuestions(shuffle(questions))
       }
       setScore(score + 1)
-      setStreak(streak + 1)
-      setTimeout(generateNewProblem, 500)
+      setTimeout(() => generateNewProblem(score + 1), 300)
     }
   }
 
@@ -110,23 +114,52 @@ const App = () => {
               {score}
             </div>
           </div>
-
-          <div className="text-center mb-8">
-            <div className="text-6xl font-bold text-gray-700 mb-8">
-              {num1} × {num2} = ?
+          {!showStart && (
+            <div className="absolute top-5 right-5">Timer: {remainingTime}</div>
+          )}
+          {!showStart && (
+            <div className="text-center mb-8">
+              <div className="text-6xl font-bold text-gray-700 mb-8">
+                {num1} × {num2} = ?
+              </div>
+              <input
+                type="tel"
+                ref={inputRef}
+                value={userAnswer}
+                onChange={checkAnswer}
+                onFocus={() => window.scrollTo(0, 0)}
+                className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
+                placeholder="?"
+                autoFocus
+              />
             </div>
-            <input
-              type="tel"
-              ref={inputRef}
-              value={userAnswer}
-              onChange={checkAnswer}
-              onFocus={() => window.scrollTo(0, 0)}
-              className="w-32 text-center text-6xl p-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 font-bold text-gray-700"
-              placeholder="?"
-              autoFocus
-            />
+          )}
+          <div className="text-center mb-8">
+            {showStart && (
+              <button
+                className="w-32 text-center text-3xl p-2 rounded-lg bg-purple-400 text-white"
+                onClick={() => {
+                  setScore(0)
+                  generateNewProblem(0)
+                  setShowStart(false)
+                  intervalRef.current = setInterval(() => {
+                    setRemainingTime((prev) => prev - 1)
+                  }, 1000)
+                  timerRef.current = setTimeout(() => {
+                    setFeedback('Time is up!')
+                    setShowStart(true)
+                    if (timerRef.current && intervalRef.current) {
+                      clearTimeout(timerRef.current)
+                      clearInterval(intervalRef.current)
+                    }
+                    setRemainingTime(ROUND_TIME_SECOND)
+                  }, ROUND_TIME_SECOND * 1000)
+                }}
+              >
+                Start
+              </button>
+            )}
           </div>
-
           {feedback && (
             <div
               className={`text-center text-xl ${
