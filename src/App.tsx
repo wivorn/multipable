@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Star, Settings, X } from 'lucide-react'
+import clsx from 'clsx'
 
 function shuffle(array: number[]) {
   let currentIndex = array.length
@@ -21,7 +22,7 @@ function shuffle(array: number[]) {
   return array
 }
 
-const ROUND_TIME_SECOND = 30
+const ROUND_TIME_SECOND = 60
 
 const App = () => {
   const [questions, setQuestions] = useState<number[]>(
@@ -35,9 +36,24 @@ const App = () => {
   const [score, setScore] = useState(0)
   const [showStart, setShowStart] = useState(true)
   const [remainingTime, setRemainingTime] = useState(ROUND_TIME_SECOND)
+  const [highScore, setHighScore] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
+
+  useEffect(() => {
+    if (remainingTime === 0) {
+      clearInterval(timerRef.current as NodeJS.Timeout)
+      setShowStart(true)
+      setRemainingTime(ROUND_TIME_SECOND)
+      setHighScore(Math.max(score, highScore))
+      setFeedback('Time is up! Your score is: ' + score)
+      setScore(0)
+    }
+  }, [remainingTime, highScore, score])
+
+  const resetQuestions = () => {
+    setQuestions(shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]))
+  }
 
   const generateNewProblem = (score: number) => {
     setNum2(questions[score % questions.length])
@@ -47,6 +63,11 @@ const App = () => {
   }
 
   const checkAnswer = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // format only numbers
+    const reg = /^[0-9\b]+$/
+    if (e.target.value !== '' && !reg.test(e.target.value)) {
+      return
+    }
     const answer = e.target.value
     setUserAnswer(answer)
 
@@ -79,24 +100,24 @@ const App = () => {
               </h1>
               <X onClick={() => setShowSettings(false)} />
             </div>
-            <button
-              className="w-28 text-center text-3xl p-2 rounded-lg bg-purple-400 text-white"
-              onClick={() => {
-                setNum1(2)
-                setShowSettings(false)
-              }}
-            >
-              2
-            </button>
-            <button
-              className="w-28 text-center text-3xl p-2 rounded-lg bg-purple-400 text-white"
-              onClick={() => {
-                setNum1(3)
-                setShowSettings(false)
-              }}
-            >
-              3
-            </button>
+            {[2, 3].map((n) => (
+              <button
+                className={clsx(
+                  'w-28 text-center text-3xl p-2 rounded-lg border-purple-400 text-purple-500 border-2 hover:bg-purple-500 hover:text-white',
+                  num1 === n && 'bg-purple-500 text-white'
+                )}
+                onClick={() => {
+                  setNum1(n)
+                  setScore(0)
+                  setHighScore(0)
+                  resetQuestions()
+                  generateNewProblem(0)
+                  setShowSettings(false)
+                }}
+              >
+                {n}
+              </button>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -117,6 +138,10 @@ const App = () => {
           {!showStart && (
             <div className="absolute top-5 right-5">Timer: {remainingTime}</div>
           )}
+          <div className="absolute top-5 left-5 flex">
+            <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+            {highScore}
+          </div>
           {!showStart && (
             <div className="text-center mb-8">
               <div className="text-6xl font-bold text-gray-700 mb-8">
@@ -142,18 +167,9 @@ const App = () => {
                   setScore(0)
                   generateNewProblem(0)
                   setShowStart(false)
-                  intervalRef.current = setInterval(() => {
+                  timerRef.current = setInterval(() => {
                     setRemainingTime((prev) => prev - 1)
                   }, 1000)
-                  timerRef.current = setTimeout(() => {
-                    setFeedback('Time is up!')
-                    setShowStart(true)
-                    if (timerRef.current && intervalRef.current) {
-                      clearTimeout(timerRef.current)
-                      clearInterval(intervalRef.current)
-                    }
-                    setRemainingTime(ROUND_TIME_SECOND)
-                  }, ROUND_TIME_SECOND * 1000)
                 }}
               >
                 Start
