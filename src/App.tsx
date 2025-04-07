@@ -100,7 +100,7 @@ const App = () => {
               </h1>
               <X onClick={() => setShowSettings(false)} />
             </div>
-            {[2, 3].map((n) => (
+            {[2, 3, 4].map((n) => (
               <button
                 className={clsx(
                   'w-28 text-center text-3xl p-2 rounded-lg border-purple-400 text-purple-500 border-2 hover:bg-purple-500 hover:text-white',
